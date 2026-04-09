@@ -1,0 +1,25 @@
+const { kv } = require('@vercel/kv');
+
+module.exports = async function handler(req, res) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ ok: false, error: 'Método no permitido' });
+  }
+
+  const apiKey = req.headers['x-api-key'];
+  if (!apiKey || apiKey !== process.env.LEADS_API_KEY) {
+    return res.status(401).json({ ok: false, error: 'API key inválida' });
+  }
+
+  const { id } = req.query;
+
+  try {
+    const lead = await kv.get(`lead:${id}`);
+    if (!lead) {
+      return res.status(404).json({ ok: false, error: 'Lead no encontrado' });
+    }
+    return res.status(200).json(lead);
+  } catch (err) {
+    console.error('Error leyendo lead:', err);
+    return res.status(500).json({ ok: false, error: 'Error al leer el lead' });
+  }
+};

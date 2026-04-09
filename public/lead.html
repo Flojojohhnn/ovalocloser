@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Óvalo Leads - Lead</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <!-- ⚠️ REEMPLAZÁ 'TU_API_KEY_AQUI' con tu LEADS_API_KEY real -->
+  <script>window.API_KEY = 'TU_API_KEY_AQUI';</script>
+</head>
+<body>
+  <div class="lead-panel" id="lead-panel">
+    <div class="lead-header" id="lead-header">
+      <div class="lead-header-top">
+        <button class="back-btn" id="back-btn">&#8592;</button>
+        <div>
+          <div class="lead-name-big" id="lead-name">Cargando...</div>
+          <div class="lead-model-subtitle" id="lead-model"></div>
+        </div>
+        <span class="badge" id="lead-temp-badge"></span>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="ficha">Ficha</button>
+      <button class="tab" data-tab="historial">Historial</button>
+      <button class="tab" data-tab="estado">Estado</button>
+    </div>
+
+    <div class="tab-content active" id="tab-ficha"></div>
+    <div class="tab-content" id="tab-historial"></div>
+    <div class="tab-content" id="tab-estado"></div>
+  </div>
+
+  <!-- Chat inferior -->
+  <div class="chat-container" id="chat-container">
+    <div class="chat-messages" id="chat-messages"></div>
+    <div class="chat-input-area">
+      <input type="text" class="chat-input" id="chat-input" placeholder="Asentá una novedad, pedí un mensaje de WhatsApp, consultá estrategia...">
+      <button class="chat-send" id="chat-send">Enviar</button>
+    </div>
+  </div>
+
+  <nav class="nav-bar">
+    <a href="/" class="nav-item">
+      <span class="nav-icon">&#128197;</span>
+      Agenda
+    </a>
+    <a href="/leads" class="nav-item">
+      <span class="nav-icon">&#128101;</span>
+      Leads
+    </a>
+  </nav>
+
+  <script src="/js/lead.js"></script>
+</body>
+</html>

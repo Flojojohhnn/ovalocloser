@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Óvalo Leads - Base de Leads</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <!-- ⚠️ REEMPLAZÁ 'TU_API_KEY_AQUI' con tu LEADS_API_KEY real -->
+  <script>window.API_KEY = 'TU_API_KEY_AQUI';</script>
+</head>
+<body>
+  <div class="page-header">
+    <h1>Base de Leads</h1>
+    <div class="subtitle">Gestión de prospectos Plan Óvalo</div>
+  </div>
+
+  <div class="container">
+    <input type="text" class="search-bar" id="search-input" placeholder="Buscar por nombre o celular...">
+
+    <div class="filters" id="filters">
+      <button class="filter-pill active" data-filter="todos">Todos</button>
+      <button class="filter-pill" data-filter="caliente">Caliente</button>
+      <button class="filter-pill" data-filter="tibia">Tibia</button>
+      <button class="filter-pill" data-filter="fria">Fría</button>
+      <button class="filter-pill" data-filter="vendido">Vendido</button>
+      <button class="filter-pill" data-filter="baja">Baja</button>
+    </div>
+
+    <select class="sort-select" id="sort-select">
+      <option value="score">Score &#8595;</option>
+      <option value="proximo">Próximo contacto</option>
+      <option value="dias_sin">Días sin contacto &#8595;</option>
+    </select>
+
+    <div id="leads-list"></div>
+  </div>
+
+  <button class="fab" title="Agregar lead (próximamente)">+</button>
+
+  <nav class="nav-bar">
+    <a href="/" class="nav-item">
+      <span class="nav-icon">&#128197;</span>
+      Agenda
+    </a>
+    <a href="/leads" class="nav-item active">
+      <span class="nav-icon">&#128101;</span>
+      Leads
+    </a>
+  </nav>
+
+  <script src="/js/leads.js"></script>
+</body>
+</html>

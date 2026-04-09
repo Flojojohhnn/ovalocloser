@@ -1,0 +1,13 @@
+{
+  "functions": {
+    "api/**/*.js": {
+      "memory": 512,
+      "maxDuration": 30
+    }
+  },
+  "rewrites": [
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/leads", "destination": "/leads.html" },
+    { "source": "/lead", "destination": "/lead.html" }
+  ]
+}
