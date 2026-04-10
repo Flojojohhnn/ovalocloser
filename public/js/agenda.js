@@ -60,7 +60,9 @@
       .then(function (res) { return res.json(); })
       .then(function (data) {
         if (!data.ok) {
-          showNotification(data.error || 'Error al generar la agenda', true);
+          var errorMsg = data.error || 'Error desconocido al generar la agenda';
+          showNotification(errorMsg, true);
+          console.error('Error del servidor:', errorMsg);
           showGenerateButton();
           return;
         }
@@ -73,8 +75,8 @@
         renderChecklist(data.resumen, data.checklist_completo);
       })
       .catch(function (err) {
-        console.error(err);
-        showNotification('Error de conexión', true);
+        console.error('Error de red:', err);
+        showNotification('Error de conexión: ' + (err.message || 'sin detalle'), true);
         showGenerateButton();
       });
   }

@@ -15,6 +15,28 @@
   var chatInput = document.getElementById('chat-input');
   var chatSendBtn = document.getElementById('chat-send');
 
+  function getApiKey() {
+    return localStorage.getItem('ovalo_leads_api_key') || '';
+  }
+
+  function checkApiKey() {
+    var modal = document.getElementById('apikey-modal');
+    if (!getApiKey()) {
+      modal.style.display = 'flex';
+      document.getElementById('apikey-save').addEventListener('click', function () {
+        var val = document.getElementById('apikey-input').value.trim();
+        if (val) {
+          localStorage.setItem('ovalo_leads_api_key', val);
+          modal.style.display = 'none';
+          loadLead();
+        }
+      });
+      return false;
+    }
+    modal.style.display = 'none';
+    return true;
+  }
+
   if (!leadId) {
     leadNameEl.textContent = 'Lead no especificado';
     return;
@@ -47,12 +69,16 @@
     }
   });
 
+  if (!checkApiKey()) {
+    loadChatHistory();
+    return;
+  }
   loadLead();
   loadChatHistory();
 
   function loadLead() {
     fetch('/api/leads/' + leadId, {
-      headers: { 'x-api-key': window.API_KEY }
+      headers: { 'x-api-key': getApiKey() }
     })
       .then(function (res) {
         if (res.status === 404) throw new Error('Lead no encontrado');
@@ -273,7 +299,7 @@
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': window.API_KEY
+        'x-api-key': getApiKey()
       },
       body: JSON.stringify(updates)
     })

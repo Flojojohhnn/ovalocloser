@@ -1,4 +1,4 @@
-const { kv } = require('@vercel/kv');
+const { kvGet, kvSet } = require('../../_kv');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -13,8 +13,8 @@ module.exports = async function handler(req, res) {
       return res.status(400).json({ ok: false, error: 'Se requiere check_id y completado' });
     }
 
-    const checklist = (await kv.get(`checklist:${fecha}`)) || [];
-    const idx = checklist.findIndex(item => item.id === check_id);
+    const checklist = (await kvGet('checklist:' + fecha)) || [];
+    const idx = checklist.findIndex(function (item) { return item.id === check_id; });
 
     if (idx < 0) {
       return res.status(404).json({ ok: false, error: 'Ítem no encontrado' });
@@ -23,11 +23,11 @@ module.exports = async function handler(req, res) {
     checklist[idx].completado = completado;
     checklist[idx].timestamp_completado = completado ? new Date().toISOString() : null;
 
-    await kv.set(`checklist:${fecha}`, checklist);
+    await kvSet('checklist:' + fecha, checklist);
 
     return res.status(200).json({ ok: true });
   } catch (err) {
     console.error('Error en toggle:', err);
-    return res.status(500).json({ ok: false, error: 'Error al actualizar el checklist' });
+    return res.status(500).json({ ok: false, error: err.message });
   }
 };

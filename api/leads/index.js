@@ -1,4 +1,4 @@
-const { kv } = require('@vercel/kv');
+const { kvGet } = require('../_kv');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -11,10 +11,10 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const index = await kv.get('leads:index');
+    const index = await kvGet('leads:index');
     return res.status(200).json(index || []);
   } catch (err) {
     console.error('Error leyendo leads:index:', err);
-    return res.status(500).json({ ok: false, error: 'Error al leer los leads' });
+    return res.status(500).json({ ok: false, error: err.message });
   }
 };

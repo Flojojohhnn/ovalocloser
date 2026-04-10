@@ -1,4 +1,4 @@
-const { kv } = require('@vercel/kv');
+const { kvGet, kvSet } = require('../../_kv');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'PATCH') {
@@ -13,18 +13,18 @@ module.exports = async function handler(req, res) {
   const { id } = req.query;
 
   try {
-    const lead = await kv.get(`lead:${id}`);
+    const lead = await kvGet('lead:' + id);
     if (!lead) {
       return res.status(404).json({ ok: false, error: 'Lead no encontrado' });
     }
 
     const updates = req.body;
-    lead.estado_actual = { ...lead.estado_actual, ...updates };
+    lead.estado_actual = Object.assign({}, lead.estado_actual, updates);
 
-    await kv.set(`lead:${id}`, lead);
+    await kvSet('lead:' + id, lead);
 
-    const index = (await kv.get('leads:index')) || [];
-    const idx = index.findIndex(l => l.id === id);
+    const index = (await kvGet('leads:index')) || [];
+    const idx = index.findIndex(function (l) { return l.id === id; });
     if (idx >= 0) {
       if (updates.temperatura !== undefined) index[idx].temperatura = updates.temperatura;
       if (updates.etapa !== undefined) index[idx].etapa = updates.etapa;
@@ -34,20 +34,20 @@ module.exports = async function handler(req, res) {
       }
       if (updates.fecha_proximo_contacto !== undefined) index[idx].fecha_proximo_contacto = updates.fecha_proximo_contacto;
       if (updates.proximo_paso !== undefined) index[idx].proximo_paso = updates.proximo_paso;
-      await kv.set('leads:index', index);
+      await kvSet('leads:index', index);
     }
 
     return res.status(200).json({ ok: true });
   } catch (err) {
     console.error('Error actualizando estado:', err);
-    return res.status(500).json({ ok: false, error: 'Error al actualizar el estado' });
+    return res.status(500).json({ ok: false, error: err.message });
   }
 };
 
 function calcularDiasSinContacto(fechaUltimoContacto) {
   if (!fechaUltimoContacto) return 0;
-  const ultimo = new Date(fechaUltimoContacto);
-  const hoy = new Date();
-  const diff = hoy - ultimo;
+  var ultimo = new Date(fechaUltimoContacto);
+  var hoy = new Date();
+  var diff = hoy - ultimo;
   return Math.floor(diff / (1000 * 60 * 60 * 24));
 }

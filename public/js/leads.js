@@ -8,9 +8,32 @@
   var sortSelect = document.getElementById('sort-select');
   var filtersEl = document.getElementById('filters');
 
+  function getApiKey() {
+    return localStorage.getItem('ovalo_leads_api_key') || '';
+  }
+
+  function checkApiKey() {
+    var modal = document.getElementById('apikey-modal');
+    if (!getApiKey()) {
+      modal.style.display = 'flex';
+      document.getElementById('apikey-save').addEventListener('click', function () {
+        var val = document.getElementById('apikey-input').value.trim();
+        if (val) {
+          localStorage.setItem('ovalo_leads_api_key', val);
+          modal.style.display = 'none';
+          loadLeads();
+        }
+      });
+      return false;
+    }
+    modal.style.display = 'none';
+    return true;
+  }
+
   init();
 
   function init() {
+    if (!checkApiKey()) return;
     loadLeads();
 
     searchInput.addEventListener('input', renderFiltered);
@@ -38,7 +61,7 @@
       '</div>';
 
     fetch('/api/leads/index', {
-      headers: { 'x-api-key': window.API_KEY }
+      headers: { 'x-api-key': getApiKey() }
     })
       .then(function (res) { return res.json(); })
       .then(function (data) {
