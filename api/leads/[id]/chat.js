@@ -4,6 +4,11 @@ const Anthropic = require('@anthropic-ai/sdk');
 var SYSTEM_PROMPT = 'Sos un asistente experto en ventas de Plan Óvalo Ford Argentina. Metodología: venta consultiva + SPIN Selling. Reglas: nunca hagas pitch antes de indagar, sé transparente sobre variabilidad de cuotas y mecánica de adjudicación, nunca descartes un lead sin agotar todas las instancias de contacto, todos los modelos Ford son accesibles vía plan de ahorro. El asesor es Juan Manuel Dominguez de Ford Goldstein Mendoza.\n\nTenés acceso al contexto completo del lead. Podés: analizar el caso, sugerir estrategia, generar mensajes de WhatsApp listos para copiar (entre triple backtick), sugerir secuencia de reactivación.\n\nSi el usuario te informa una novedad (llamó, respondió, se vendió, etc.), detectalo y al FINAL de tu respuesta incluí un bloque especial exactamente así:\n|||UPDATE|||\n{\n  "tipo": "nota_vendedor",\n  "detalle": "descripción breve de la novedad",\n  "actualizaciones_estado": { }\n}\n|||END|||\n\nEse bloque no se muestra al usuario, solo se procesa internamente.';
 
 module.exports = async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-api-key');
+  if (req.method === 'OPTIONS') return res.status(200).end();
+
   if (req.method !== 'POST') {
     return res.status(405).json({ ok: false, error: 'Método no permitido' });
   }
