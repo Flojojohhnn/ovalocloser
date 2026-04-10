@@ -1,33 +1,54 @@
-async function kvGet(key) {
-  const res = await fetch(process.env.KV_REST_API_URL, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(['GET', key])
+const https = require('https');
+
+function kvRequest(method, path, body) {
+  return new Promise((resolve, reject) => {
+    const url = new URL(process.env.KV_REST_API_URL);
+    const options = {
+      hostname: url.hostname,
+      port: 443,
+      path: path,
+      method: method,
+      headers: {
+        'Authorization': `Bearer ${process.env.KV_REST_API_TOKEN}`,
+        'Content-Type': 'application/json',
+      }
+    };
+
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
+          resolve(JSON.parse(data));
+        } catch(e) {
+          resolve({ result: null });
+        }
+      });
+    });
+
+    req.on('error', reject);
+
+    if (body !== undefined) {
+      req.write(JSON.stringify(body));
+    }
+    req.end();
   });
-  const data = await res.json();
-  if (data.error) throw new Error('KV GET error: ' + data.error);
-  if (data.result === null || data.result === undefined) return null;
-  if (typeof data.result === 'string') {
-    try { return JSON.parse(data.result); } catch (e) { return data.result; }
+}
+
+async function kvGet(key) {
+  const res = await kvRequest('GET', `/get/${encodeURIComponent(key)}`);
+  if (!res.result) return null;
+  try {
+    return JSON.parse(res.result);
+  } catch(e) {
+    return res.result;
   }
-  return data.result;
 }
 
 async function kvSet(key, value) {
-  const res = await fetch(process.env.KV_REST_API_URL, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(['SET', key, JSON.stringify(value)])
-  });
-  const data = await res.json();
-  if (data.error) throw new Error('KV SET error: ' + data.error);
-  return data;
+  const encoded = JSON.stringify(value);
+  await kvRequest('POST', `/set/${encodeURIComponent(key)}`, [encoded]);
+  return true;
 }
 
 module.exports = { kvGet, kvSet };
